@@ -132,6 +132,7 @@ console.log("Client and Contact Management System is running...");
 // Test adding clients
 addClient("Information Technology", "it@gmail.com");
 addClient("Human Resources", "hr@gmail.com");
+addClient("Human Resources", "hr@gmail.com");
 
 // Test adding contacts
 addContact("John", "Doe", "john.doe@gmail.com");
