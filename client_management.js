@@ -137,6 +137,7 @@ addClient("Human Resources", "hr@gmail.com");
 // Test adding contacts
 addContact("John", "Doe", "john.doe@gmail.com");
 addContact("Jane", "Smith", "jane.smith@gmail.com");
+addContact("Jane", "Smith", "jane.smith@gmail.com");
 
 // Test linking
 linkClientContact(1, 1);
