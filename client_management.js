@@ -139,7 +139,7 @@ addContact("Jane", "Smith", "jane.smith@gmail.com");
 
 // Test linking
 linkClientContact(1, 1);
-linkClientContact(1, 2);
+linkClientContact(2, 1);
 linkClientContact(2, 1);
 
 // Test listing
