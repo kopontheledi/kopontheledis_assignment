@@ -152,10 +152,10 @@ console.log("\nListing all contacts:");
 listContacts(); 
 
 console.log("\nListing contacts for client 1:");
-listClientContacts(1); 
+listClientContacts(2); 
 
 // Test unlinking
-unlinkClientContact(1, 2); // Unlink client 1 from contact 2
+unlinkClientContact(3, 1); // Unlink client 1 from contact 2
 
 console.log("\nListing contacts for client 1 after unlinking:");
-listClientContacts(1); // List contacts linked to client 1 after unlinking
+listClientContacts(3); // List contacts linked to client 1 after unlinking
