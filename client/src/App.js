@@ -1,80 +1,54 @@
-// App.js
 import React, { useState, useEffect } from 'react';
-import ClientList from './components/clientList';
-import ContactList from './components/ContactList';
-import ClientForm from './components/clientForm';
-import ContactForm from './components/ContactForm';
+import ClientForm from './components/clientForm';// Assuming you have a ClientForm component
 
 function App() {
   const [clients, setClients] = useState([]);
-  const [contacts, setContacts] = useState([]);
-  const [error, setError] = useState(null);
 
+  // Fetch clients when the component mounts
   useEffect(() => {
     fetchClients();
-    fetchContacts();
   }, []);
 
+  // Fetch all clients from the backend
   const fetchClients = async () => {
     try {
       const response = await fetch('http://localhost:5000/clients');
-      const clients = await response.json();
-      setClients(clients);
+      const data = await response.json();
+      setClients(data); // Store the fetched clients
     } catch (err) {
-      setError('Error fetching clients');
+      console.error('Error fetching clients:', err);
     }
   };
 
-  const fetchContacts = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/contacts');
-      const contacts = await response.json();
-      setContacts(contacts);
-    } catch (err) {
-      setError('Error fetching contacts');
-    }
-  };
-
+  // Create a new client
   const createClient = async (name, email) => {
     try {
       const response = await fetch('http://localhost:5000/clients', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, email }),
       });
-      const newClient = await response.json();
-      setClients([...clients, newClient]);
-    } catch (err) {
-      setError('Error creating client');
-    }
-  };
 
-  const createContact = async (name, surname, email) => {
-    try {
-      const response = await fetch('http://localhost:5000/contacts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, surname, email })
-      });
-      const newContact = await response.json();
-      setContacts([...contacts, newContact]);
+      const newClient = await response.json();
+      setClients((prevClients) => [...prevClients, newClient]); // Add new client to state
     } catch (err) {
-      setError('Error creating contact');
+      console.error('Error creating client:', err);
     }
   };
 
   return (
     <div>
-      {error && (
-        <div>
-          <p>{error}</p>
-          <button onClick={() => setError(null)}>Close</button>
-        </div>
-      )}
-      <ClientList clients={clients} />
-      <ContactList contacts={contacts} />
+      <h1>Client List</h1>
       <ClientForm onCreateClient={createClient} />
-      <ContactForm onCreateContact={createContact} />
+      <ul>
+        {clients.map((client) => (
+          <li key={client.id}>
+            {client.name} ({client.email}) - Code: {client.code}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

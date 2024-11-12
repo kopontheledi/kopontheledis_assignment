@@ -1,8 +1,6 @@
-// database.js
 const sqlite3 = require('sqlite3').verbose();
-const db = new sqlite3.Database('database.db');
+const db = new sqlite3.Database('./database.db');
 
-// Create tables if they don't exist
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS clients (
@@ -33,25 +31,17 @@ db.serialize(() => {
   `);
 });
 
+
 function generateClientCode(name) {
-  const alphaPart = name.substring(0, 2).toUpperCase();
-  const randomNumber = Math.floor(1000 + Math.random() * 9000);
-  return `${alphaPart}${randomNumber}`;
+  const alphaPart = name.substring(0, 3).toUpperCase(); // Ensure 3 letters
+  return `${alphaPart}${Math.floor(Math.random() * 1000)}`;
 }
 
-const database = {
+
+module.exports.database = {
   getClients: () => {
     return new Promise((resolve, reject) => {
       db.all('SELECT * FROM clients ORDER BY name ASC', (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
-  },
-
-  getContacts: () => {
-    return new Promise((resolve, reject) => {
-      db.all('SELECT * FROM contacts ORDER BY surname, name ASC', (err, rows) => {
         if (err) reject(err);
         else resolve(rows);
       });
@@ -72,6 +62,15 @@ const database = {
     });
   },
 
+  getContacts: () => {
+    return new Promise((resolve, reject) => {
+      db.all('SELECT * FROM contacts ORDER BY surname, name ASC', (err, rows) => {
+        if (err) reject(err);
+        else resolve(rows);
+      });
+    });
+  },
+
   createContact: (name, surname, email) => {
     return new Promise((resolve, reject) => {
       db.run(
@@ -83,33 +82,5 @@ const database = {
         }
       );
     });
-  },
-
-  linkClientContact: (clientId, contactId) => {
-    return new Promise((resolve, reject) => {
-      db.run(
-        'INSERT INTO client_contact_links (client_id, contact_id) VALUES (?, ?)',
-        [clientId, contactId],
-        function (err) {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
-  },
-
-  unlinkClientContact: (clientId, contactId) => {
-    return new Promise((resolve, reject) => {
-      db.run(
-        'DELETE FROM client_contact_links WHERE client_id = ? AND contact_id = ?',
-        [clientId, contactId],
-        function (err) {
-          if (err) reject(err);
-          else resolve();
-        }
-      );
-    });
   }
 };
-
-module.exports = { database };

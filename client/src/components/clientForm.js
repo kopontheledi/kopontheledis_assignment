@@ -1,41 +1,41 @@
 import React, { useState } from 'react';
 
-function ClientForm() {
+function ClientForm({ onCreateClient }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      const response = await fetch('http://localhost:5000/clients', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email }),
-      });
-      const data = await response.json();
-      console.log('Client created:', data);
-    } catch (err) {
-      console.error('Error creating client:', err);
+    if (name && email) {
+      onCreateClient(name, email); // Call the function passed via props
+      setName('');
+      setEmail('');
+    } else {
+      alert('Please enter both name and email');
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <button type="submit">Create Client</button>
+      <label>
+        Name:
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
+      </label>
+      <label>
+        Email:
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+      </label>
+      <button type="submit">Add Client</button>
     </form>
   );
 }
