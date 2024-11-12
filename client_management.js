@@ -193,7 +193,7 @@ addClient("Human Resources", "hr@gmail.com");
 addClient("Human Resources", "hr@gmail.com");
 
 // Test adding contacts
-addContact("John", "Doe", "john.doe@gmail.com");
+addContact("John", "Doe", "john.doe@gmail.com"); 
 addContact("Jane", "Smith", "jane.smith@gmail.com");
 addContact("Jane", "Smith", "jane.smith@gmail.com");
 
