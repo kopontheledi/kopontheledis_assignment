@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import ClientList from './components/clientList';
 import ContactList from './components/ContactList';
-import ClientForm from './components/ClientForm';
+import ClientForm from './components/clientForm';
 import ContactForm from './components/ContactForm';
 
 function App() {

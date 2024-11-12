@@ -1,43 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Client and Contact Management</title>
+</head>
+<body>
+  <h1>Clients</h1>
+  <table id="clientTable">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Code</th>
+    </tr>
+  </table>
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+  <h2>Add Client</h2>
+  <form id="addClientForm">
+    <input type="text" id="clientName" placeholder="Name" required>
+    <input type="email" id="clientEmail" placeholder="Email" required>
+    <button type="submit">Add Client</button>
+  </form>
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+  <h1>Contacts</h1>
+  <table id="contactTable">
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Surname</th>
+      <th>Email</th>
+    </tr>
+  </table>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+  <h2>Add Contact</h2>
+  <form id="addContactForm">
+    <input type="text" id="contactName" placeholder="Name" required>
+    <input type="text" id="contactSurname" placeholder="Surname" required>
+    <input type="email" id="contactEmail" placeholder="Email" required>
+    <button type="submit">Add Contact</button>
+  </form>
+
+  <script>
+    // Fetch and display clients
+    async function fetchClients() {
+      const response = await fetch('/clients');
+      const clients = await response.json();
+      const clientTable = document.getElementById('clientTable');
+      clients.forEach(client => {
+        const row = clientTable.insertRow();
+        row.innerHTML = `<td>${client.id}</td><td>${client.name}</td><td>${client.email}</td><td>${client.code}</td>`;
+      });
+    }
+
+    // Fetch and display contacts
+    async function fetchContacts() {
+      const response = await fetch('/contacts');
+      const contacts = await response.json();
+      const contactTable = document.getElementById('contactTable');
+      contacts.forEach(contact => {
+        const row = contactTable.insertRow();
+        row.innerHTML = `<td>${contact.id}</td><td>${contact.name}</td><td>${contact.surname}</td><td>${contact.email}</td>`;
+      });
+    }
+
+    // Add a new client
+    document.getElementById('addClientForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('clientName').value;
+      const email = document.getElementById('clientEmail').value;
+      await fetch('/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      });
+      location.reload();
+    });
+
+    // Add a new contact
+    document.getElementById('addContactForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('contactName').value;
+      const surname = document.getElementById('contactSurname').value;
+      const email = document.getElementById('contactEmail').value;
+      await fetch('/contacts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, surname, email })
+      });
+      location.reload();
+    });
+
+    // Initialize data fetching
+    fetchClients();
+    fetchContacts();
+  </script>
+</body>
 </html>
