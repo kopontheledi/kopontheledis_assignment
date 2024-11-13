@@ -25,6 +25,20 @@ const ContactForm = ({ clients, onSave, onCancel, contacts }) => {
     onSave(contactData);
   };
 
+  const handleLinkClient = (clientId) => {
+    setContactData((prevState) => ({
+      ...prevState,
+      linkedClients: [...prevState.linkedClients, clientId],
+    }));
+  };
+
+  const handleUnlinkClient = (clientId) => {
+    setContactData((prevState) => ({
+      ...prevState,
+      linkedClients: prevState.linkedClients.filter(id => id !== clientId),
+    }));
+  };
+
   return (
     <div>
       <div className="tabs">
@@ -81,9 +95,15 @@ const ContactForm = ({ clients, onSave, onCancel, contacts }) => {
                     <td>{client.name}</td>
                     <td>{client.code}</td>
                     <td>
-                      <a href={`#unlink-${client.id}`} onClick={() => handleUnlinkClient(client.id)}>
-                        Unlink
-                      </a>
+                      {contactData.linkedClients.includes(client.id) ? (
+                        <a href={`#unlink-${client.id}`} onClick={() => handleUnlinkClient(client.id)}>
+                          Unlink
+                        </a>
+                      ) : (
+                        <a href={`#link-${client.id}`} onClick={() => handleLinkClient(client.id)}>
+                          Link
+                        </a>
+                      )}
                     </td>
                   </tr>
                 ))}

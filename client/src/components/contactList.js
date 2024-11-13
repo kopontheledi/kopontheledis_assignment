@@ -22,7 +22,7 @@ const ContactList = ({ contacts, onLinkContact }) => {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table><br></br>
       <button onClick={() => onLinkContact(null)}>Create New Contact</button>
     </div>
   );
