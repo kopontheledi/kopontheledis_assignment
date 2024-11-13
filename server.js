@@ -49,20 +49,7 @@ function generateClientCode(name) {
   const alphaPart = name.substring(0, 3).toUpperCase();
   return `${alphaPart}${Math.floor(Math.random() * 1000)}`;
 }
-// Endpoint to delete a client
-app.delete('/clients/:id', (req, res) => {
-  const clientId = req.params.id;
 
-  db.run('DELETE FROM clients WHERE id = ?', clientId, function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-    } else if (this.changes === 0) {
-      res.status(404).json({ error: "Client not found" });
-    } else {
-      res.json({ message: "Client deleted successfully" });
-    }
-  });
-});
 
 // Start server
 app.listen(PORT, () => {
