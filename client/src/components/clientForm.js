@@ -1,3 +1,4 @@
+// Correcting ClientForm Component
 import React, { useState } from 'react';
 
 function ClientForm({ onCreateClient }) {
@@ -7,7 +8,7 @@ function ClientForm({ onCreateClient }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (name && email) {
-      onCreateClient(name, email); // Call the function passed via props
+      onCreateClient(name, email);
       setName('');
       setEmail('');
     } else {
