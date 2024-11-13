@@ -3,97 +3,56 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Client and Contact Management</title>
+  <title>Client Management</title>
 </head>
 <body>
-  <h1>Clients</h1>
-  <table id="clientTable">
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Email</th>
-      <th>Code</th>
-    </tr>
-  </table>
+  <h1>Client Management</h1>
 
-  <h2>Add Client</h2>
-  <form id="addClientForm">
-    <input type="text" id="clientName" placeholder="Name" required>
-    <input type="email" id="clientEmail" placeholder="Email" required>
+  <form id="clientForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+    
     <button type="submit">Add Client</button>
   </form>
 
-  <h1>Contacts</h1>
-  <table id="contactTable">
-    <tr>
-      <th>ID</th>
-      <th>Name</th>
-      <th>Surname</th>
-      <th>Email</th>
-    </tr>
-  </table>
-
-  <h2>Add Contact</h2>
-  <form id="addContactForm">
-    <input type="text" id="contactName" placeholder="Name" required>
-    <input type="text" id="contactSurname" placeholder="Surname" required>
-    <input type="email" id="contactEmail" placeholder="Email" required>
-    <button type="submit">Add Contact</button>
-  </form>
+  <h2>Client List</h2>
+  <ul id="clientList"></ul>
 
   <script>
-    // Fetch and display clients
+    document.getElementById('clientForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+
+      const response = await fetch('/clients', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email }),
+      });
+      
+      if (response.ok) {
+        const client = await response.json();
+        addClientToList(client);
+        document.getElementById('clientForm').reset();
+      }
+    });
+
     async function fetchClients() {
       const response = await fetch('/clients');
       const clients = await response.json();
-      const clientTable = document.getElementById('clientTable');
-      clients.forEach(client => {
-        const row = clientTable.insertRow();
-        row.innerHTML = `<td>${client.id}</td><td>${client.name}</td><td>${client.email}</td><td>${client.code}</td>`;
-      });
+      clients.forEach(addClientToList);
     }
 
-    // Fetch and display contacts
-    async function fetchContacts() {
-      const response = await fetch('/contacts');
-      const contacts = await response.json();
-      const contactTable = document.getElementById('contactTable');
-      contacts.forEach(contact => {
-        const row = contactTable.insertRow();
-        row.innerHTML = `<td>${contact.id}</td><td>${contact.name}</td><td>${contact.surname}</td><td>${contact.email}</td>`;
-      });
+    function addClientToList(client) {
+      const li = document.createElement('li');
+      li.textContent = `${client.name} (${client.email}) - Code: ${client.code}`;
+      document.getElementById('clientList').appendChild(li);
     }
 
-    // Add a new client
-    document.getElementById('addClientForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('clientName').value;
-      const email = document.getElementById('clientEmail').value;
-      await fetch('/clients', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email })
-      });
-      location.reload();
-    });
-
-    // Add a new contact
-    document.getElementById('addContactForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('contactName').value;
-      const surname = document.getElementById('contactSurname').value;
-      const email = document.getElementById('contactEmail').value;
-      await fetch('/contacts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, surname, email })
-      });
-      location.reload();
-    });
-
-    // Initialize data fetching
-    fetchClients();
-    fetchContacts();
+    fetchClients(); // Load clients when page loads
   </script>
 </body>
 </html>
