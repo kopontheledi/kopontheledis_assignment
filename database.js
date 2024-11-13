@@ -1,7 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./database.db');
 
-// Create tables if they don't exist
+// Create tables
 db.serialize(() => {
   db.run(`
     CREATE TABLE IF NOT EXISTS clients (
@@ -32,13 +32,17 @@ db.serialize(() => {
   `);
 });
 
-// Function to generate client code
-function generateClientCode(name) {
-  const alphaPart = name.substring(0, 3).toUpperCase(); // First 3 letters in uppercase
-  return `${alphaPart}${Math.floor(Math.random() * 1000)}`;
-}
+// Function to delete a contact
+const removeContact = (id) => {
+  return new Promise((resolve, reject) => {
+    db.run('DELETE FROM contacts WHERE id = ?', [id], function (err) {
+      if (err) reject(err);
+      else resolve();
+    });
+  });
+};
 
-// Database functions
+// Exported database functions
 const getClients = () => {
   return new Promise((resolve, reject) => {
     db.all('SELECT * FROM clients ORDER BY name ASC', (err, rows) => {
@@ -81,16 +85,6 @@ const createContact = (name, surname, email) => {
         else resolve({ id: this.lastID, name, surname, email });
       }
     );
-  });
-};
-
-// Function to remove contact
-const removeContact = (contactId) => {
-  return new Promise((resolve, reject) => {
-    db.run('DELETE FROM contacts WHERE id = ?', [contactId], function (err) {
-      if (err) reject(err);
-      else resolve({ message: 'Contact removed' });
-    });
   });
 };
 

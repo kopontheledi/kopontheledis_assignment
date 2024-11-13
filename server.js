@@ -1,18 +1,16 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const { getClients, createClient, getContacts, createContact, removeContact } = require('./database'); // Import database functions
+const { getClients, createClient, getContacts, createContact, removeContact } = require('./database'); // Make sure to include removeContact
 const app = express();
 const PORT = 5000;
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from "public"
 
 // Routes for API
 
-// Route to get all clients
+// Get all clients
 app.get('/clients', async (req, res) => {
   try {
     const clients = await getClients();
@@ -22,7 +20,7 @@ app.get('/clients', async (req, res) => {
   }
 });
 
-// Route to create a new client
+// Create a new client
 app.post('/clients', async (req, res) => {
   const { name, email } = req.body;
   try {
@@ -33,7 +31,7 @@ app.post('/clients', async (req, res) => {
   }
 });
 
-// Route to get all contacts
+// Get all contacts
 app.get('/contacts', async (req, res) => {
   try {
     const contacts = await getContacts();
@@ -43,7 +41,7 @@ app.get('/contacts', async (req, res) => {
   }
 });
 
-// Route to create a new contact
+// Create a new contact
 app.post('/contacts', async (req, res) => {
   const { name, surname, email } = req.body;
   try {
@@ -54,12 +52,12 @@ app.post('/contacts', async (req, res) => {
   }
 });
 
-// Route to remove a contact
+// Delete a contact by ID
 app.delete('/contacts/:id', async (req, res) => {
-  const contactId = req.params.id;
+  const { id } = req.params;
   try {
-    const result = await removeContact(contactId);
-    res.json(result);
+    await removeContact(id);
+    res.json({ message: 'Contact removed' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -3,15 +3,17 @@ import React, { useState } from 'react';
 function ClientForm({ onCreateClient }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [surname, setSurname] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (name && email) {
-      onCreateClient(name, email);
+      onCreateClient(name, email, surname);
       setName('');
+      setSurname('');
       setEmail('');
     } else {
-      alert('Please enter both name and email');
+      alert('Please enter both name, surname and email');
     }
   };
 
@@ -23,6 +25,14 @@ function ClientForm({ onCreateClient }) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+      <label>
+        Surname:
+        <input
+          type="text"
+          value={surname}
+          onChange={(e) => setSurname(e.target.value)}
         />
       </label>
       <label>
