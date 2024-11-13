@@ -1,52 +1,108 @@
 import React, { useState } from 'react';
+import ContactList from './clientList';
 
-function ContactForm({ onCreateContact, clients }) {
-  const [name, setName] = useState('');
-  const [surname, setSurname] = useState('');
-  const [email, setEmail] = useState('');
-  const [clientId, setClientId] = useState('');
+const ContactForm = ({ clients, onSave, onCancel, contacts }) => {
+  const [activeTab, setActiveTab] = useState('general');
+  const [contactData, setContactData] = useState({
+    name: '',
+    surname: '',
+    email: '',
+    linkedClients: [],
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onCreateContact(name, surname, email, clientId);
-    setName('');
-    setSurname('');
-    setEmail('');
-    setClientId('');
+  const handleTabChange = (tab) => setActiveTab(tab);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setContactData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+
+  const handleSave = () => {
+    // validate and save contact data
+    onSave(contactData);
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Add Contact</h3>
-      <input
-        type="text"
-        placeholder="First Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Surname"
-        value={surname}
-        onChange={(e) => setSurname(e.target.value)}
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <select onChange={(e) => setClientId(e.target.value)} value={clientId}>
-        <option value="">Select Client</option>
-        {clients.map((client) => (
-          <option key={client.id} value={client.id}>
-            {client.name}
-          </option>
-        ))}
-      </select>
-      <button type="submit">Add Contact</button>
-    </form>
+    <div>
+      <div className="tabs">
+        <button onClick={() => handleTabChange('general')}>General</button>
+        <button onClick={() => handleTabChange('clients')}>Clients</button>
+      </div>
+      {activeTab === 'general' && (
+        <div>
+          <h3>General Information</h3>
+          <label>Name</label>
+          <input
+            type="text"
+            name="name"
+            value={contactData.name}
+            onChange={handleInputChange}
+            required
+          />
+          <label>Surname</label>
+          <input
+            type="text"
+            name="surname"
+            value={contactData.surname}
+            onChange={handleInputChange}
+            required
+          />
+          <label>Email</label>
+          <input
+            type="email"
+            name="email"
+            value={contactData.email}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+      )}
+
+      {activeTab === 'clients' && (
+        <div>
+          <h3>Link Clients</h3>
+          {clients.length === 0 ? (
+            <p>No client(s) found</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th>Client Name</th>
+                  <th>Client Code</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {clients.map((client) => (
+                  <tr key={client.id}>
+                    <td>{client.name}</td>
+                    <td>{client.code}</td>
+                    <td>
+                      <a href={`#unlink-${client.id}`} onClick={() => handleUnlinkClient(client.id)}>
+                        Unlink
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      )}
+
+      {/* Save and Cancel Buttons */}
+      <div>
+        <button onClick={handleSave}>Save Contact</button>
+        <button onClick={onCancel}>Cancel</button>
+      </div>
+
+      {/* Optional: Display Contact List */}
+      <ContactList contacts={contacts} onLinkContact={onSave} />
+    </div>
   );
-}
+};
 
 export default ContactForm;

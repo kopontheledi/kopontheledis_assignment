@@ -50,24 +50,46 @@ app.get('/clients', (req, res) => {
 // POST clients
 app.post('/clients', (req, res) => {
   const { name, email } = req.body;
-  const code = `CL${Math.floor(Math.random() * 1000) + 100}`; // Generate a simple code
-
+  
+  // Validate name and email
   if (!name || !email) {
     return res.status(400).json({ error: 'Name and email are required' });
   }
+  
+  // Generate a unique code (3 alphabetic characters followed by 3 digits)
+  const generateCode = () => {
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const code = `${letters.charAt(Math.floor(Math.random() * 26))}${letters.charAt(Math.floor(Math.random() * 26))}${letters.charAt(Math.floor(Math.random() * 26))}${numbers.charAt(Math.floor(Math.random() * 10))}${numbers.charAt(Math.floor(Math.random() * 10))}${numbers.charAt(Math.floor(Math.random() * 10))}`;
+    return code;
+  };
 
-  db.run(
-    'INSERT INTO clients (name, email, code) VALUES (?, ?, ?)',
-    [name, email, code],
-    function (err) {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({ id: this.lastID, name, email, code });
+  // Ensure code is unique
+  const code = generateCode();
+  db.get('SELECT * FROM clients WHERE code = ?', [code], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
     }
-  );
+    if (row) {
+      return res.status(400).json({ error: 'Code must be unique' });
+    }
+
+    // Insert new client with generated code
+    db.run(
+      'INSERT INTO clients (name, email, code) VALUES (?, ?, ?)',
+      [name, email, code],
+      function (err) {
+        if (err) {
+          res.status(500).json({ error: err.message });
+          return;
+        }
+        res.json({ id: this.lastID, name, email, code });
+      }
+    );
+  });
 });
+
 
 // GET contacts
 app.get('/contacts', (req, res) => {
