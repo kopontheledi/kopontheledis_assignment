@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import ContactList from './components/clientList';
 import ContactForm from './components/contactForm';
-import ContactSummary from './components/contactSummary';
+import ContactSummary from './components/ContactSummary';
 
 const App = () => {
   return (

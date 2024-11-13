@@ -1,7 +1,7 @@
 // ContactList.js
 
 import React from 'react';
-import ContactSummary from './contactSummary'; // Import the ContactSummary component
+import ContactSummary from './ContactSummary'; // Import the ContactSummary component
 
 const ContactList = ({ contacts, onLinkContact }) => {
   if (contacts.length === 0) {
