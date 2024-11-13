@@ -1,69 +1,140 @@
 const express = require('express');
-const cors = require('cors');
-const { getClients, createClient, getContacts, createContact, removeContact } = require('./database'); // Make sure to include removeContact
+const sqlite3 = require('sqlite3').verbose();
+const bodyParser = require('body-parser');
 const app = express();
-const PORT = 5000;
+const port = 5000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-// Routes for API
-
-// Get all clients
-app.get('/clients', async (req, res) => {
-  try {
-    const clients = await getClients();
-    res.json(clients);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+const db = new sqlite3.Database('./database.db', (err) => {
+  if (err) {
+    console.error('Error opening database', err.message);
+  } else {
+    console.log('Connected to the SQLite database.');
   }
 });
 
-// Create a new client
-app.post('/clients', async (req, res) => {
+// Create clients table if it doesn't exist
+db.run(`
+  CREATE TABLE IF NOT EXISTS clients (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    email TEXT,
+    code TEXT
+  );
+`);
+
+// Create contacts table if it doesn't exist
+db.run(`
+  CREATE TABLE IF NOT EXISTS contacts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    surname TEXT,
+    email TEXT,
+    clientId INTEGER,
+    FOREIGN KEY (clientId) REFERENCES clients(id)
+  );
+`);
+
+// GET clients
+app.get('/clients', (req, res) => {
+  db.all('SELECT * FROM clients', [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
+});
+
+// POST clients
+app.post('/clients', (req, res) => {
   const { name, email } = req.body;
-  try {
-    const newClient = await createClient(name, email);
-    res.json(newClient);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+  const code = `CL${Math.floor(Math.random() * 1000) + 100}`; // Generate a simple code
+
+  if (!name || !email) {
+    return res.status(400).json({ error: 'Name and email are required' });
   }
+
+  db.run(
+    'INSERT INTO clients (name, email, code) VALUES (?, ?, ?)',
+    [name, email, code],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ id: this.lastID, name, email, code });
+    }
+  );
 });
 
-// Get all contacts
-app.get('/contacts', async (req, res) => {
-  try {
-    const contacts = await getContacts();
-    res.json(contacts);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// GET contacts
+app.get('/contacts', (req, res) => {
+  db.all('SELECT * FROM contacts', [], (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    res.json(rows);
+  });
 });
 
-// Create a new contact
-app.post('/contacts', async (req, res) => {
-  const { name, surname, email } = req.body;
-  try {
-    const newContact = await createContact(name, surname, email);
-    res.json(newContact);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+// POST contacts
+app.post('/contacts', (req, res) => {
+  const { name, surname, email, clientId } = req.body;
+
+  if (!name || !surname || !email || !clientId) {
+    return res.status(400).json({ error: 'All fields are required' });
   }
+
+  db.run(
+    'INSERT INTO contacts (name, surname, email, clientId) VALUES (?, ?, ?, ?)',
+    [name, surname, email, clientId],
+    function (err) {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({ id: this.lastID, name, surname, email, clientId });
+    }
+  );
 });
 
-// Delete a contact by ID
-app.delete('/contacts/:id', async (req, res) => {
+// DELETE contact
+app.delete('/contacts/:id', (req, res) => {
   const { id } = req.params;
-  try {
-    await removeContact(id);
+
+  db.run('DELETE FROM contacts WHERE id = ?', [id], function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Contact not found' });
+    }
     res.json({ message: 'Contact removed' });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+// DELETE client
+app.delete('/clients/:id', (req, res) => {
+  const { id } = req.params;
+
+  db.run('DELETE FROM clients WHERE id = ?', [id], function (err) {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ error: 'Client not found' });
+    }
+    res.json({ message: 'Client removed' });
+  });
+});
+
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 });

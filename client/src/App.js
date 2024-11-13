@@ -50,20 +50,37 @@ function App() {
     }
   };
 
-  const createContact = async (name, surname, email) => {
+  const createContact = async (name, surname, email, clientId) => {
     try {
       const response = await fetch('http://localhost:5000/contacts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, surname, email }),
+        body: JSON.stringify({ name, surname, email, clientId }),
       });
 
       const newContact = await response.json();
       setContacts((prevContacts) => [...prevContacts, newContact]);
     } catch (err) {
       console.error('Error creating contact:', err);
+    }
+  };
+
+  const removeClient = async (clientId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/clients/${clientId}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+      if (result.message === 'Client removed') {
+        setClients((prevClients) =>
+          prevClients.filter((client) => client.id !== clientId)
+        );
+      }
+    } catch (err) {
+      console.error('Error removing client:', err);
     }
   };
 
@@ -88,8 +105,8 @@ function App() {
     <div>
       <h1>Client & Contact Management</h1>
       <ClientForm onCreateClient={createClient} />
-      <ClientList clients={clients} />
-      <ContactForm onCreateContact={createContact} />
+      <ClientList clients={clients} onRemoveClient={removeClient} />
+      <ContactForm onCreateContact={createContact} clients={clients} />
       <ContactList contacts={contacts} onRemoveContact={removeContact} />
     </div>
   );
