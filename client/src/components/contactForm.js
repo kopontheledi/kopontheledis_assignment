@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import React, { useState } from 'react';
 // import ContactList from './clientList';
 
@@ -112,6 +113,10 @@ import ContactList from './contactList';
 =======
 >>>>>>> parent of 799eabc (fixes)
 
+=======
+import React, { useState } from 'react';
+
+>>>>>>> parent of 799eabc (fixes)
 const ContactForm = ({ onSave, onCancel }) => {
   const [activeTab, setActiveTab] = useState('general');
   const [formData, setFormData] = useState({
@@ -130,9 +135,12 @@ const ContactForm = ({ onSave, onCancel }) => {
   };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   const handleSave = () => {
     onSave(contactData);
 =======
+=======
+>>>>>>> parent of 799eabc (fixes)
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -155,6 +163,7 @@ const ContactForm = ({ onSave, onCancel }) => {
     } catch (error) {
       setMessage('Error saving contact');
     }
+<<<<<<< HEAD
 >>>>>>> parent of 799eabc (fixes)
   };
 
@@ -163,6 +172,8 @@ const ContactForm = ({ onSave, onCancel }) => {
       ...prevData,
       linkedClients: prevData.linkedClients.filter((id) => id !== clientId),
     }));
+=======
+>>>>>>> parent of 799eabc (fixes)
   };
 
   return (
@@ -217,6 +228,7 @@ const ContactForm = ({ onSave, onCancel }) => {
         </form>
       )}
 <<<<<<< HEAD
+<<<<<<< HEAD
 
       {activeTab === 'clients' && (
         <div>
@@ -258,13 +270,19 @@ const ContactForm = ({ onSave, onCancel }) => {
       <ContactList contacts={contacts} onLinkContact={onSave} />
 =======
 >>>>>>> parent of 799eabc (fixes)
+=======
+>>>>>>> parent of 799eabc (fixes)
     </div>
   );
 };
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 export default ContactForm;
 
+=======
+export default ContactForm;
+>>>>>>> parent of 799eabc (fixes)
 =======
 export default ContactForm;
 >>>>>>> parent of 799eabc (fixes)

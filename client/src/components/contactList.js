@@ -1,6 +1,9 @@
 import React from 'react';
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 799eabc (fixes)
 
 const ContactList = ({ contacts, onLinkContact, onUnlinkClient }) => {
   if (contacts.length === 0) {
@@ -61,5 +64,9 @@ export default ContactList;
   );
 };
 
+<<<<<<< HEAD
+export default ContactList;
+>>>>>>> parent of 799eabc (fixes)
+=======
 export default ContactList;
 >>>>>>> parent of 799eabc (fixes)
