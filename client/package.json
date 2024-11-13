@@ -5,7 +5,10 @@
   "main": "client_management.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
@@ -16,5 +19,8 @@
     "express": "^4.21.1",
     "sqlite3": "^5.1.7"
   },
-  "devDependencies": {}
+  "devDependencies": {
+     "concurrently": "^6.2.0",
+    "nodemon": "^2.0.7"
+  }
 }
