@@ -1,11 +1,41 @@
-body {
-    background-color: blueviolet;
-    color: #fff;
-}
-
-h1 {
-    color: black;
-}
-button {
-    color: #000;
-}
+/* Tabs Styling */
+.tabs button {
+    padding: 10px;
+    margin-right: 5px;
+    cursor: pointer;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+  }
+  
+  .tabs button.active {
+    background-color: #ddd;
+    font-weight: bold;
+  }
+  
+  button {
+    padding: 8px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  th {
+    background-color: #f2f2f2;
+  }
+  
