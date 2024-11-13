@@ -7,34 +7,43 @@ function ContactForm({ onCreateContact }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onCreateContact(name, surname, email);
-    setName('');
-    setSurname('');
-    setEmail('');
+    if (name && surname && email) {
+      onCreateContact(name, surname, email);
+      setName('');
+      setSurname('');
+      setEmail('');
+    } else {
+      alert('Please enter name, surname, and email');
+    }
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h3>Create New Contact</h3>
-      <input 
-        type="text" 
-        placeholder="Name" 
-        value={name} 
-        onChange={(e) => setName(e.target.value)} 
-      />
-      <input 
-        type="text" 
-        placeholder="Surname" 
-        value={surname} 
-        onChange={(e) => setSurname(e.target.value)} 
-      />
-      <input 
-        type="email" 
-        placeholder="Email" 
-        value={email} 
-        onChange={(e) => setEmail(e.target.value)} 
-      />
-      <button type="submit">Add Contact</button>
+      <label>
+        Name:
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </label>
+      <label>
+        Surname:
+        <input
+          type="text"
+          value={surname}
+          onChange={(e) => setSurname(e.target.value)}
+        />
+      </label>
+      <label>
+        Email:
+        <input
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
+      </label>
+      <button type="submit">Create Contact</button>
     </form>
   );
 }

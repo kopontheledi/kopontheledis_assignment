@@ -7,7 +7,7 @@ function ClientList({ clients }) {
       <ul>
         {clients.map((client) => (
           <li key={client.id}>
-            <p>{client.name} - {client.email} (Code: {client.code})</p>
+            {client.name} - {client.email} ({client.code})
           </li>
         ))}
       </ul>

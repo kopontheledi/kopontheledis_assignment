@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ClientForm from './components/ClientForm';
+import ClientForm from './components/clientForm';
 import ClientList from './components/ClientList';
 import ContactForm from './components/ContactForm';
 import ContactList from './components/ContactList';
@@ -23,6 +23,16 @@ function App() {
     }
   };
 
+  const fetchContacts = async () => {
+    try {
+      const response = await fetch('http://localhost:5000/contacts');
+      const data = await response.json();
+      setContacts(data);
+    } catch (err) {
+      console.error('Error fetching contacts:', err);
+    }
+  };
+
   const createClient = async (name, email) => {
     try {
       const response = await fetch('http://localhost:5000/clients', {
@@ -37,16 +47,6 @@ function App() {
       setClients((prevClients) => [...prevClients, newClient]);
     } catch (err) {
       console.error('Error creating client:', err);
-    }
-  };
-
-  const fetchContacts = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/contacts');
-      const data = await response.json();
-      setContacts(data);
-    } catch (err) {
-      console.error('Error fetching contacts:', err);
     }
   };
 
@@ -67,13 +67,30 @@ function App() {
     }
   };
 
+  const removeContact = async (contactId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/contacts/${contactId}`, {
+        method: 'DELETE',
+      });
+
+      const result = await response.json();
+      if (result.message === 'Contact removed') {
+        setContacts((prevContacts) =>
+          prevContacts.filter((contact) => contact.id !== contactId)
+        );
+      }
+    } catch (err) {
+      console.error('Error removing contact:', err);
+    }
+  };
+
   return (
     <div>
-      <h1>Client and Contact Management</h1>
+      <h1>Client & Contact Management</h1>
       <ClientForm onCreateClient={createClient} />
       <ClientList clients={clients} />
       <ContactForm onCreateContact={createContact} />
-      <ContactList contacts={contacts} />
+      <ContactList contacts={contacts} onRemoveContact={removeContact} />
     </div>
   );
 }

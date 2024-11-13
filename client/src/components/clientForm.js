@@ -23,7 +23,6 @@ function ClientForm({ onCreateClient }) {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          required
         />
       </label>
       <label>
@@ -32,10 +31,9 @@ function ClientForm({ onCreateClient }) {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          required
         />
       </label>
-      <button type="submit">Add Client</button>
+      <button type="submit">Create Client</button>
     </form>
   );
 }

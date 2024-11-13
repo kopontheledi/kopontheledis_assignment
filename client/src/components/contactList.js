@@ -1,13 +1,14 @@
 import React from 'react';
 
-function ContactList({ contacts }) {
+function ContactList({ contacts, onRemoveContact }) {
   return (
     <div>
       <h2>Contacts</h2>
       <ul>
         {contacts.map((contact) => (
           <li key={contact.id}>
-            <p>{contact.name} {contact.surname} - {contact.email}</p>
+            {contact.name} {contact.surname} - {contact.email}{' '}
+            <button onClick={() => onRemoveContact(contact.id)}>Remove</button>
           </li>
         ))}
       </ul>
