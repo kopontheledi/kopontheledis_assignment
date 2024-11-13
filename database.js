@@ -52,19 +52,29 @@ const getClients = () => {
   });
 };
 
-const createClient = (name, email) => {
-  return new Promise((resolve, reject) => {
-    const code = generateClientCode(name);
-    db.run(
-      'INSERT INTO clients (name, email, code) VALUES (?, ?, ?)',
-      [name, email, code],
-      function (err) {
-        if (err) reject(err);
-        else resolve({ id: this.lastID, name, email, code });
-      }
-    );
-  });
+const createClient = async (name, surname, email) => {
+  try {
+    const response = await fetch('http://localhost:5000/clients', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ name, surname, email }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Server error:', errorData);
+      throw new Error('Failed to create client');
+    }
+
+    const newClient = await response.json();
+    setClients((prevClients) => [...prevClients, newClient]);
+  } catch (err) {
+    console.error('Error creating client:', err.message);
+  }
 };
+
 
 const getContacts = () => {
   return new Promise((resolve, reject) => {
