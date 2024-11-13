@@ -8,7 +8,7 @@ const PORT = 5000;
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, './public/index'))); // Serve static files from "public"
+app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from "public"
 
 // Database Setup
 const db = new sqlite3.Database('./database.db');
