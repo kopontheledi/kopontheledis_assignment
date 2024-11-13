@@ -5,6 +5,8 @@ const app = express();
 const port = 5000;
 
 app.use(bodyParser.json());
+app.use(express.static('public'));
+
 
 const db = new sqlite3.Database('./database.db', (err) => {
   if (err) {
