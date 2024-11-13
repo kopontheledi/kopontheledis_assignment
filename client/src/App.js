@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import ContactForm from './ContactForm';
-import ContactList from './ContactList';
+import ContactForm from './components/contactForm';
+import ContactList from './components/contactList';
 
 const App = () => {
   const [contacts, setContacts] = useState([]);
