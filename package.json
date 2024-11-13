@@ -4,14 +4,17 @@
   "description": "A JavaScript-based system for managing clients and their associated contacts. This system allows for creating, linking, and managing client-contact relationships with a user-friendly interface.\r Features",
   "main": "client_management.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "sqlite3": "^5.1.7"
-  }
+  },
+  "devDependencies": {}
 }

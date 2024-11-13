@@ -1,164 +1,113 @@
+// server.js
+require('dotenv').config();
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
-const bodyParser = require('body-parser');
 const app = express();
-const port = 5000;
+const port = process.env.PORT || 5000;
 
-app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.json());
 
-
-const db = new sqlite3.Database('./database.db', (err) => {
-  if (err) {
-    console.error('Error opening database', err.message);
-  } else {
-    console.log('Connected to the SQLite database.');
-  }
+// Connect to SQLite Database
+const db = new sqlite3.Database(process.env.DB_PATH || './database.db', (err) => {
+  if (err) console.error('Could not connect to database:', err.message);
+  else console.log('Connected to SQLite database');
 });
 
-// Create clients table if it doesn't exist
-db.run(`
-  CREATE TABLE IF NOT EXISTS clients (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    email TEXT,
-    code TEXT
-  );
-`);
+// Helper functions
+const generateCode = () => {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  return Array.from({ length: 6 }, () => characters[Math.floor(Math.random() * characters.length)]).join('');
+};
 
-// Create contacts table if it doesn't exist
-db.run(`
-  CREATE TABLE IF NOT EXISTS contacts (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    surname TEXT,
-    email TEXT,
-    clientId INTEGER,
-    FOREIGN KEY (clientId) REFERENCES clients(id)
-  );
-`);
+const generateUniqueCode = async () => {
+  let code;
+  let existing;
 
-// GET clients
-app.get('/clients', (req, res) => {
-  db.all('SELECT * FROM clients', [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
+  do {
+    code = generateCode();
+    existing = await new Promise((resolve, reject) => {
+      db.get('SELECT 1 FROM clients WHERE code = ?', [code], (err, row) => {
+        if (err) reject(err);
+        else resolve(row);
+      });
+    });
+  } while (existing);
 
-// POST clients
-app.post('/clients', (req, res) => {
+  return code;
+};
+
+// Routes
+app.post('/clients', async (req, res) => {
   const { name, email } = req.body;
   
-  // Validate name and email
   if (!name || !email) {
     return res.status(400).json({ error: 'Name and email are required' });
   }
-  
-  // Generate a unique code (3 alphabetic characters followed by 3 digits)
-  const generateCode = () => {
-    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const numbers = '0123456789';
-    const code = `${letters.charAt(Math.floor(Math.random() * 26))}${letters.charAt(Math.floor(Math.random() * 26))}${letters.charAt(Math.floor(Math.random() * 26))}${numbers.charAt(Math.floor(Math.random() * 10))}${numbers.charAt(Math.floor(Math.random() * 10))}${numbers.charAt(Math.floor(Math.random() * 10))}`;
-    return code;
-  };
 
-  // Ensure code is unique
-  const code = generateCode();
-  db.get('SELECT * FROM clients WHERE code = ?', [code], (err, row) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    if (row) {
-      return res.status(400).json({ error: 'Code must be unique' });
-    }
-
-    // Insert new client with generated code
-    db.run(
-      'INSERT INTO clients (name, email, code) VALUES (?, ?, ?)',
-      [name, email, code],
-      function (err) {
-        if (err) {
-          res.status(500).json({ error: err.message });
-          return;
-        }
-        res.json({ id: this.lastID, name, email, code });
-      }
-    );
-  });
-});
-
-
-// GET contacts
-app.get('/contacts', (req, res) => {
-  db.all('SELECT * FROM contacts', [], (err, rows) => {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
-    }
-    res.json(rows);
-  });
-});
-
-// POST contacts
-app.post('/contacts', (req, res) => {
-  const { name, surname, email, clientId } = req.body;
-
-  if (!name || !surname || !email || !clientId) {
-    return res.status(400).json({ error: 'All fields are required' });
-  }
+  const code = await generateUniqueCode();
 
   db.run(
-    'INSERT INTO contacts (name, surname, email, clientId) VALUES (?, ?, ?, ?)',
-    [name, surname, email, clientId],
+    'INSERT INTO clients (name, email, code) VALUES (?, ?, ?)',
+    [name, email, code],
     function (err) {
       if (err) {
-        res.status(500).json({ error: err.message });
-        return;
+        if (err.message.includes('UNIQUE constraint failed')) {
+          return res.status(409).json({ error: 'Client with this name or email already exists' });
+        }
+        return res.status(500).json({ error: err.message });
       }
-      res.json({ id: this.lastID, name, surname, email, clientId });
+      res.json({ id: this.lastID, name, email, code });
     }
   );
 });
 
-// DELETE contact
-app.delete('/contacts/:id', (req, res) => {
-  const { id } = req.params;
+app.post('/contacts', (req, res) => {
+  const { name, surname, email } = req.body;
+  const validateEmail = (email) => /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email);
 
-  db.run('DELETE FROM contacts WHERE id = ?', [id], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+  if (!name || !surname || !email) {
+    return res.status(400).json({ error: 'Name, surname, and email are required' });
+  }
+
+  if (!validateEmail(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+
+  db.run(
+    'INSERT INTO contacts (name, surname, email) VALUES (?, ?, ?)',
+    [name, surname, email],
+    function (err) {
+      if (err) {
+        if (err.message.includes('UNIQUE constraint failed')) {
+          return res.status(409).json({ error: 'Contact with this email already exists' });
+        }
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ id: this.lastID, name, surname, email });
     }
-    if (this.changes === 0) {
-      return res.status(404).json({ error: 'Contact not found' });
-    }
-    res.json({ message: 'Contact removed' });
-  });
+  );
 });
 
-// DELETE client
-app.delete('/clients/:id', (req, res) => {
-  const { id } = req.params;
+app.post('/client-contact-links', (req, res) => {
+  const { clientId, contactId } = req.body;
 
-  db.run('DELETE FROM clients WHERE id = ?', [id], function (err) {
-    if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+  if (!clientId || !contactId) {
+    return res.status(400).json({ error: 'Client and Contact IDs are required' });
+  }
+
+  db.run(
+    'INSERT INTO client_contact_links (client_id, contact_id) VALUES (?, ?)',
+    [clientId, contactId],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json({ message: 'Contact linked to client' });
     }
-    if (this.changes === 0) {
-      return res.status(404).json({ error: 'Client not found' });
-    }
-    res.json({ message: 'Client removed' });
-  });
+  );
 });
 
-
-// Start the server
+// Start server
 app.listen(port, () => {
-  console.log(`Server running on http://localhost:${port}`);
+  console.log(`Server is running on port ${port}`);
 });
