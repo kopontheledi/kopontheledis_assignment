@@ -1,4 +1,3 @@
-// ClientList.js
 import React from 'react';
 
 function ClientList({ clients }) {

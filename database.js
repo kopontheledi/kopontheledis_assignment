@@ -34,7 +34,7 @@ db.serialize(() => {
 
 // Function to generate client code
 function generateClientCode(name) {
-  const alphaPart = name.substring(0, 3).toUpperCase(); // First 3 letters in uppercase
+  const alphaPart = name.substring(0, 3).toUpperCase();
   return `${alphaPart}${Math.floor(Math.random() * 1000)}`;
 }
 
@@ -84,7 +84,6 @@ const createContact = (name, surname, email) => {
   });
 };
 
-// Export the functions to use in server.js
 module.exports = {
   getClients,
   createClient,

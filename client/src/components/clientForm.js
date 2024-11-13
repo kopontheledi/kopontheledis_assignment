@@ -1,4 +1,3 @@
-// Correcting ClientForm Component
 import React, { useState } from 'react';
 
 function ClientForm({ onCreateClient }) {
